@@ -1,0 +1,12 @@
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\Kennen.exe.config
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\Kennen.exe
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\Kennen.pdb
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\LeagueSharp.Common.dll
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\LeagueSharp.dll
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\SharpDX.dll
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\clipper_library.dll
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\bin\Debug\LeagueSharp.Sandbox.dll
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\obj\Debug\Kennen.csprojResolveAssemblyReference.cache
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\obj\Debug\Kennen.exe
+C:\Users\Alex\Documents\Visual Studio 2013\Projects\Kennen\obj\Debug\Kennen.pdb
