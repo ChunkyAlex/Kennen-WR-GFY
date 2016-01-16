@@ -198,7 +198,7 @@ namespace Kennen
                 var wCount = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range)
                     .Where(minion => minion.IsValidTarget() && minion.HasBuff("kennenmarkofstorm")).Count();
 
-                Game.PrintChat("slider: {0} , current count: {1}", minW, wCount);
+                
 
                 if (!ObjectManager.Player.HasBuff("KennenLightningRush") && wCount >= minW)
                 {
