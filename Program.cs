@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Linq;
 using LeagueSharp.Common;
@@ -60,7 +60,8 @@ namespace Kennen
                         laneclearMenu.AddItem(new MenuItem("q.clear", "Use (Q)").SetValue(true));
                         laneclearMenu.AddItem(new MenuItem("keysinfo3", "                  (E) Settings").SetTooltip("E Settings"));
                         laneclearMenu.AddItem(new MenuItem("e.clear", "Use (E)").SetValue(true));
-                        laneclearMenu.AddItem(new MenuItem("e.clear.minion.count", "(E) Min. Minion Count").SetValue(new Slider(3, 1, 10)));
+                        laneclearMenu.AddItem(new MenuItem("w.clear", "Use (W)").SetValue(true));
+                        laneclearMenu.AddItem(new MenuItem("w.clear.minion.count", "(W) Min. Minion Count").SetValue(new Slider(3, 1, 10)));
                         clearMenu.AddSubMenu(laneclearMenu);
                     }
 
@@ -153,10 +154,8 @@ namespace Kennen
         }
         private static void LaneClear()
         {
-            if (ObjectManager.Player.ManaPercent < Config.Item("clear.mana").GetValue<Slider>().Value)
-            {
-                return;
-            }
+
+          
 
             if (Q.IsReady() && Config.Item("q.clear").GetValue<bool>())
             {
@@ -169,13 +168,44 @@ namespace Kennen
             }
             if (E.IsReady() && Config.Item("e.clear").GetValue<bool>())
             {
-                var min = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
-                if (min.Count > Config.Item("e.clear.minion.count").GetValue<Slider>().Value)
+                   
+                var minionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range)
+                    .Where(minion => minion.IsValidTarget() && !minion.HasBuff("kennenmarkofstorm") && !minion.UnderTurret(true))
+                    .OrderBy(minion => minion.Distance(ObjectManager.Player.ServerPosition));
+
+                if (!ObjectManager.Player.HasBuff("KennenLightningRush"))
                 {
                     E.Cast();
                 }
+
+                if (ObjectManager.Player.HasBuff("KennenLightningRush")) 
+                { 
+                    var target = minionsE.FirstOrDefault(); 
+                    if (target != null) 
+                    { 
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, target); 
+                    } 
+                    else 
+                    { 
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos); 
+                    } 
+                }
             }
 
+            if (W.IsReady() && Config.Item("w.clear").GetValue<bool>())
+            {
+                var minW = Config.Item("w.clear.minion.count").GetValue<Slider>().Value;
+                var wCount = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range)
+                    .Where(minion => minion.IsValidTarget() && minion.HasBuff("kennenmarkofstorm")).Count();
+
+                Game.PrintChat("slider: {0} , current count: {1}", minW, wCount);
+
+                if (!ObjectManager.Player.HasBuff("KennenLightningRush") && wCount >= minW)
+                {
+                    W.Cast();
+                }
+
+            }
         }
         private static void Harass()
         {
@@ -253,5 +283,7 @@ namespace Kennen
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range, Config.Item("r.draw").GetValue<Circle>().Color);
             }
         }
+
+        public static float Range { get; set; }
     }
 }
