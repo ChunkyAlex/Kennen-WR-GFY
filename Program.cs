@@ -41,6 +41,7 @@ namespace Kennen
                 {
                     comboMenu.AddItem(new MenuItem("q.combo", "Use (Q)").SetValue(true));
                     comboMenu.AddItem(new MenuItem("w.combo", "Use (W)").SetValue(true));
+                    comboMenu.AddItem(new MenuItem("e.combo", "Use E for Gapclose").SetValue(true));
                     comboMenu.AddItem(new MenuItem("r.combo", "Use (R)").SetValue(true));
                     comboMenu.AddItem(new MenuItem("r.hit.count", "Min Enemy Count (R)").SetValue(new Slider(4, 1, 5)));
                     Config.AddSubMenu(comboMenu);
@@ -237,6 +238,14 @@ namespace Kennen
                 {
                     W.Cast();
                 }
+
+                if (Config.Item("e.combo").GetValue<bool>())
+                {
+                    foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget(E.Range) && !x.IsDead && !x.IsZombie && !ObjectManager.Player.HasBuff("KennenLightningRush")))
+                    {
+                        E.Cast();
+                    }
+                }
             }
 
             if (Config.Item("r.combo").GetValue<bool>() && R.IsReady())
@@ -254,7 +263,7 @@ namespace Kennen
             if (Config.Item("flee.active.x").GetValue<KeyBind>().Active)
             {
                 ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-                if (E.IsReady())
+                if (E.IsReady() &&!ObjectManager.Player.HasBuff("KennenLightningRush"))
                 {
                     E.Cast();
                 }
