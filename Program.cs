@@ -90,28 +90,28 @@ namespace Kennen
                     }
                     Config.AddSubMenu(drawMenu);
                 }
-                Config.AddItem(new MenuItem("flee.active.x", "Flee (E)").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))).SetFontStyle(FontStyle.Bold,SharpDX.Color.Orange);
+                Config.AddItem(new MenuItem("flee.active.x", "Flee (E)").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))).SetFontStyle(FontStyle.Bold, SharpDX.Color.Orange);
                 Config.AddToMainMenu();
             }
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
-            
+
         }
         private static void OnUpdate(EventArgs args)
         {
             switch (Orbwalker.ActiveMode)
             {
-                    case Orbwalking.OrbwalkingMode.Combo:
+                case Orbwalking.OrbwalkingMode.Combo:
                     Combo();
                     break;
-                    case Orbwalking.OrbwalkingMode.Mixed:
+                case Orbwalking.OrbwalkingMode.Mixed:
                     Harass();
                     break;
-                    case Orbwalking.OrbwalkingMode.LaneClear:
+                case Orbwalking.OrbwalkingMode.LaneClear:
                     LaneClear();
                     JungleClear();
                     break;
-                    case Orbwalking.OrbwalkingMode.None:
+                case Orbwalking.OrbwalkingMode.None:
                     Flee();
                     break;
             }
@@ -124,10 +124,10 @@ namespace Kennen
         }
         private static void JungleClear()
         {
-           
+
             if (Q.IsReady() && Config.Item("q.jungle").GetValue<bool>())
             {
-                var mob = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, ObjectManager.Player.AttackRange + 50 ,MinionTypes.All,MinionTeam.Neutral);
+                var mob = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, ObjectManager.Player.AttackRange + 50, MinionTypes.All, MinionTeam.Neutral);
                 if (mob[0].IsValid)
                 {
                     Q.Cast(mob[0]);
@@ -156,7 +156,7 @@ namespace Kennen
         private static void LaneClear()
         {
 
-          
+
 
             if (Q.IsReady() && Config.Item("q.clear").GetValue<bool>())
             {
@@ -166,10 +166,18 @@ namespace Kennen
                 {
                     Q.Cast(minion);
                 }
+           if (Q.IsReady() && Config.Item("q.clear").GetValue<bool>())
+            {
+                    var vMinions = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range);
+                    foreach (Obj_AI_Base minions in
+                        vMinions.Where(minions => minions.Health < ObjectManager.Player.GetSpellDamage(minions, SpellSlot.Q) && (Orbwalker.GetTarget() == null || minions.ToString() != Orbwalker.GetTarget().ToString())))
+                        Q.Cast(minions);
+                }
             }
+
             if (E.IsReady() && Config.Item("e.clear").GetValue<bool>())
             {
-                   
+
                 var minionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range)
                     .Where(minion => minion.IsValidTarget() && !minion.HasBuff("kennenmarkofstorm") && !minion.UnderTurret(true))
                     .OrderBy(minion => minion.Distance(ObjectManager.Player.ServerPosition));
@@ -179,27 +187,26 @@ namespace Kennen
                     E.Cast();
                 }
 
-                if (ObjectManager.Player.HasBuff("KennenLightningRush")) 
-                { 
-                    var target = minionsE.FirstOrDefault(); 
-                    if (target != null) 
-                    { 
-                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, target); 
-                    } 
-                    else 
-                    { 
-                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos); 
-                    } 
+                if (ObjectManager.Player.HasBuff("KennenLightningRush"))
+                {
+                    var target = minionsE.FirstOrDefault();
+                    if (target != null)
+                    {
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, target);
+                    }
+                    else
+                    {
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                    }
                 }
             }
 
             if (W.IsReady() && Config.Item("w.clear").GetValue<bool>())
             {
                 var minW = Config.Item("w.clear.minion.count").GetValue<Slider>().Value;
-                var wCount = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range)
-                    .Where(minion => minion.IsValidTarget() && minion.HasBuff("kennenmarkofstorm")).Count();
+                var wCount = MinionManager
+                    .GetMinions(ObjectManager.Player.ServerPosition, W.Range).Count(minion => minion.IsValidTarget() && minion.HasBuff("kennenmarkofstorm"));
 
-                
 
                 if (!ObjectManager.Player.HasBuff("KennenLightningRush") && wCount >= minW)
                 {
@@ -210,7 +217,7 @@ namespace Kennen
         }
         private static void Harass()
         {
-            
+
             if (Config.Item("q.harass").GetValue<bool>() && Q.IsReady())
             {
                 foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget(Q.Range) &&
@@ -224,7 +231,7 @@ namespace Kennen
         {
             if (Config.Item("q.combo").GetValue<bool>() && Q.IsReady())
             {
-                foreach (var enemy in HeroManager.Enemies.Where(x=> x.IsValidTarget(Q.Range) && 
+                foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget(Q.Range) &&
                     Q.GetPrediction(x).Hitchance >= HitChance.High && Q.GetPrediction(x).CollisionObjects.Count == 0))
                 {
                     Q.Cast(enemy);
@@ -234,7 +241,7 @@ namespace Kennen
             if (Config.Item("w.combo").GetValue<bool>() && W.IsReady())
             {
                 // ReSharper disable once UnusedVariable
-                foreach (var enemy in HeroManager.Enemies.Where(x=> x.IsEnemyStunnable() && x.IsValidTarget(W.Range)))
+                foreach (var enemy in HeroManager.Enemies.Where(x => x.IsEnemyStunnable() && x.IsValidTarget(W.Range)))
                 {
                     W.Cast();
                 }
@@ -251,7 +258,7 @@ namespace Kennen
             if (Config.Item("r.combo").GetValue<bool>() && R.IsReady())
             {
                 // ReSharper disable once UnusedVariable
-                foreach (var enemy in HeroManager.Enemies.Where(x=> x.IsValidTarget(R.Range) && R.GetDamage(x) > x.Health))
+                foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget(R.Range) && R.GetDamage(x) > x.Health))
                 {
                     R.Cast();
                 }
@@ -259,11 +266,11 @@ namespace Kennen
         }
         private static void Flee()
         {
-            
+
             if (Config.Item("flee.active.x").GetValue<KeyBind>().Active)
             {
                 ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-                if (E.IsReady() &&!ObjectManager.Player.HasBuff("KennenLightningRush"))
+                if (E.IsReady() && !ObjectManager.Player.HasBuff("KennenLightningRush"))
                 {
                     E.Cast();
                 }
