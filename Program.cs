@@ -299,7 +299,7 @@ namespace Kennen
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range, Config.Item("r.draw").GetValue<Circle>().Color);
             }
         }
-
+//h3h3 is ein blöder homo
         public static float Range { get; set; }
     }
 }
